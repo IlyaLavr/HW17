@@ -11,32 +11,39 @@ import SnapKit
 class ViewController: UIViewController {
     
     private var isStopSearch = Bool()
+    
     // MARK: - Elements
     
     private lazy var label: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .white
-        label.text = "Enter password and press Start"
-        label.textColor = .black
+        label.backgroundColor = .darkGray
+        label.text = "Введите пароль в поле ниже или сгененируйте случайным образом"
+        label.textColor = .systemGray6
         label.textAlignment = .center
-        label.layer.cornerRadius = 20
+        label.numberOfLines = 0
         label.clipsToBounds = true
+        label.layer.cornerRadius = 20
+        label.layer.cornerRadius = 17
+        label.layer.shadowColor = UIColor.white.cgColor
+        label.layer.shadowOpacity = 0.3
+        label.layer.shadowOffset = .zero
+        label.layer.shadowRadius = 9
         return label
     }()
     
     private lazy var textField: UITextField = {
         let textField = UITextField()
         textField.textColor = .black
-        textField.backgroundColor = .gray
+        textField.backgroundColor = .darkGray
         textField.textAlignment = .center
         textField.keyboardType = .default
         textField.addTarget(self, action: #selector(textCountTextField), for: .editingChanged)
-        textField.placeholder = "Введите пароль или сгененируйте случайным образом"
+        textField.placeholder = "password"
         textField.layer.cornerRadius = 17
-        textField.layer.shadowColor = UIColor.black.cgColor
+        textField.layer.shadowColor = UIColor.white.cgColor
         textField.layer.shadowOpacity = 0.3
         textField.layer.shadowOffset = .zero
-        textField.layer.shadowRadius = 17
+        textField.layer.shadowRadius = 9
         return textField
     }()
     
@@ -50,14 +57,13 @@ class ViewController: UIViewController {
         let button = UIButton()
         button.backgroundColor = .blue
         button.setTitle("Случайный пароль", for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: CGFloat(20))
+        button.titleLabel?.font = .systemFont(ofSize: CGFloat(18))
         button.addTarget(self, action: #selector(randomPassword), for: .touchUpInside)
         button.layer.cornerRadius = 17
-        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowColor = UIColor.white.cgColor
         button.layer.shadowOpacity = 0.3
         button.layer.shadowOffset = .zero
-        button.layer.shadowRadius = 17
-        
+        button.layer.shadowRadius = 9
         return button
     }()
     
@@ -65,13 +71,13 @@ class ViewController: UIViewController {
         let button = UIButton()
         button.backgroundColor = .blue
         button.setTitle("Старт", for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: CGFloat(20))
+        button.titleLabel?.font = .systemFont(ofSize: CGFloat(18))
         button.addTarget(self, action: #selector(startSearch), for: .touchUpInside)
         button.layer.cornerRadius = 17
-        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowColor = UIColor.white.cgColor
         button.layer.shadowOpacity = 0.3
         button.layer.shadowOffset = .zero
-        button.layer.shadowRadius = 17
+        button.layer.shadowRadius = 9
         return button
     }()
     
@@ -79,16 +85,15 @@ class ViewController: UIViewController {
         let button = UIButton()
         button.backgroundColor = .red
         button.setTitle("Стоп", for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: CGFloat(20))
+        button.titleLabel?.font = .systemFont(ofSize: CGFloat(18))
         button.addTarget(self, action: #selector(stopSearch), for: .touchUpInside)
         button.layer.cornerRadius = 17
-        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowColor = UIColor.white.cgColor
         button.layer.shadowOpacity = 0.3
         button.layer.shadowOffset = .zero
-        button.layer.shadowRadius = 17
+        button.layer.shadowRadius = 9
         return button
     }()
-    
     
     // MARK: - Lyfecycle
     override func viewDidLoad() {
@@ -111,7 +116,7 @@ class ViewController: UIViewController {
     private func setupLayout() {
         
         label.snp.makeConstraints { make in
-            make.top.equalTo(view.snp.top).offset(150)
+            make.top.equalTo(view.snp.top).offset(200)
             make.left.equalTo(view.snp.left).offset(20)
             make.right.equalTo(view.snp.right).offset(-20)
             make.height.equalTo(60)
@@ -155,19 +160,19 @@ class ViewController: UIViewController {
     
     @objc func randomPassword() {
         let len = 3
-        let pswdChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
-        let randomdPasswordd = String((0..<len).compactMap{ _ in pswdChars.randomElement() })
-        textField.text = randomdPasswordd
+        let passwordCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+        let randomdPassword = String((0..<len).compactMap{ _ in passwordCharacters.randomElement() })
+        textField.text = randomdPassword
         textField.isSecureTextEntry = true
     }
     
     @objc func startSearch() {
-        guard let password = textField.text, password != "" else { return label.text = "Please, enter password" }
+        guard let password = textField.text, password != "" else { return  showAllertEmpty() }
         isStopSearch = false
-        
-        let brutQueue = DispatchQueue(label: "brutQueue", qos: .background, attributes: .concurrent)
-        brutQueue.async { [self] in
-            bruteForce(passwordToUnlock: password)
+        textField.isSecureTextEntry = true
+        let queue = DispatchQueue(label: "brutQueue", qos: .background, attributes: .concurrent)
+        queue.async {
+            self.bruteForce(passwordToUnlock: password)
         }
     }
     
@@ -199,9 +204,7 @@ class ViewController: UIViewController {
                     self.textField.isEnabled = true
                     self.label.text = "Ваш код \(passwordToUnlock) не взломан!"
                     self.indicator.stopAnimating()
-                    
                 }
-                
                 return
             }
             password = generateBruteForce(password, fromArray: ALLOWED_CHARACTERS)
@@ -211,9 +214,7 @@ class ViewController: UIViewController {
                 self.indicator.startAnimating()
                 self.label.text = password
             }
-            print(password)
         }
-        print(password)
         DispatchQueue.main.async {
             self.label.text = password
             self.indicator.stopAnimating()
@@ -221,7 +222,6 @@ class ViewController: UIViewController {
             self.textField.isEnabled = true
             self.textField.isSecureTextEntry = false
         }
-        
     }
 }
 
@@ -256,8 +256,7 @@ func generateBruteForce(_ string: String, fromArray array: [String]) -> String {
     
     if str.count <= 0 {
         str.append(characterAt(index: 0, array))
-    }
-    else {
+    } else {
         str.replace(at: str.count - 1,
                     with: characterAt(index: (indexOf(character: str.last!, array) + 1) % array.count, array))
         
@@ -265,10 +264,8 @@ func generateBruteForce(_ string: String, fromArray array: [String]) -> String {
             str = String(generateBruteForce(String(str.dropLast()), fromArray: array)) + String(str.last!)
         }
     }
-    
     return str
 }
-
 
 // MARK: - Extensions
 
@@ -278,9 +275,19 @@ extension ViewController {
     
     func showAllert() {
         let alert = UIAlertController(title: "Внимание!",
-                                      message: "Введите не больше 3-х симовлов!",
+                                      message: "Больше 3-х символов искать отказываюсь!",
                                       preferredStyle: .alert)
         let actionOne = UIAlertAction(title: "Исправлюсь!",
+                                      style: .cancel)
+        alert.addAction(actionOne)
+        present(alert, animated: true)
+    }
+    
+    func showAllertEmpty() {
+        let alert = UIAlertController(title: "Эй, человек!",
+                                      message: "Ну ты пароль то введи, что я подбирать буду!",
+                                      preferredStyle: .alert)
+        let actionOne = UIAlertAction(title: "Окееей!",
                                       style: .cancel)
         alert.addAction(actionOne)
         present(alert, animated: true)
