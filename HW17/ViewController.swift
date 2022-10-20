@@ -159,9 +159,10 @@ class ViewController: UIViewController {
     // MARK: - Actions
     
     @objc func randomPassword() {
-        let len = 3
+        label.text = "Новый пароль готов! Нажмите Старт"
+        let countCharacters = 3
         let passwordCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
-        let randomdPassword = String((0..<len).compactMap{ _ in passwordCharacters.randomElement() })
+        let randomdPassword = String((0..<countCharacters).compactMap{ _ in passwordCharacters.randomElement() })
         textField.text = randomdPassword
         textField.isSecureTextEntry = true
     }
