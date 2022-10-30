@@ -12,6 +12,18 @@ class ViewController: UIViewController {
     
     private var isStopSearch = Bool()
     
+    var isBlack: Bool = false {
+            didSet {
+                if isBlack {
+                    self.view.backgroundColor = .lightGray
+                    buttonChangeColour.backgroundColor = .orange
+                } else {
+                    self.view.backgroundColor = .white
+                    buttonChangeColour.backgroundColor = .blue
+                }
+            }
+        }
+    
     // MARK: - Elements
     
     private lazy var label: UILabel = {
@@ -95,6 +107,20 @@ class ViewController: UIViewController {
         return button
     }()
     
+    private lazy var buttonChangeColour: UIButton = {
+        let button = UIButton()
+        button.backgroundColor = .orange
+        button.setTitle("Цвет", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: CGFloat(18))
+        button.addTarget(self, action: #selector(changeColour), for: .touchUpInside)
+        button.layer.cornerRadius = 50
+        button.layer.shadowColor = UIColor.white.cgColor
+        button.layer.shadowOpacity = 0.3
+        button.layer.shadowOffset = .zero
+        button.layer.shadowRadius = 9
+        return button
+    }()
+    
     // MARK: - Lyfecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -111,6 +137,7 @@ class ViewController: UIViewController {
         view.addSubview(buttonRandomPassword)
         view.addSubview(buttonStartSearch)
         view.addSubview(buttonStop)
+        view.addSubview(buttonChangeColour)
     }
     
     private func setupLayout() {
@@ -154,6 +181,13 @@ class ViewController: UIViewController {
             make.right.equalTo(view.snp.right).offset(-20)
             make.height.equalTo(60)
         }
+        
+        buttonChangeColour.snp.makeConstraints { make in
+            make.top.equalTo(buttonStop.snp.bottom).offset(30)
+            make.centerX.equalTo(view)
+            make.height.equalTo(100)
+            make.width.equalTo(100)
+        }
     }
     
     // MARK: - Actions
@@ -189,6 +223,10 @@ class ViewController: UIViewController {
             textField.isSecureTextEntry = true
         }
     }
+    
+    @objc func changeColour() {
+            isBlack.toggle()
+        }
     
     private func stopBruteForce() {
         isStopSearch.toggle()
