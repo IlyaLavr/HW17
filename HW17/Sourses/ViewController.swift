@@ -15,7 +15,7 @@ class ViewController: UIViewController {
     var isBlack: Bool = false {
             didSet {
                 if isBlack {
-                    self.view.backgroundColor = .lightGray
+                    self.view.backgroundColor = .black
                     buttonChangeColour.backgroundColor = .orange
                 } else {
                     self.view.backgroundColor = .white
@@ -243,15 +243,17 @@ class ViewController: UIViewController {
                     self.textField.isEnabled = true
                     self.label.text = "Ваш код \(passwordToUnlock) не взломан!"
                     self.indicator.stopAnimating()
+                    self.buttonRandomPassword.isEnabled = true
                 }
                 return
             }
             password = generateBruteForce(password, fromArray: ALLOWED_CHARACTERS)
-            DispatchQueue.main.async {
-                self.indicator.isHidden = false
-                self.textField.isEnabled = false
-                self.indicator.startAnimating()
-                self.label.text = password
+            DispatchQueue.main.async { [self] in
+                buttonRandomPassword.isEnabled = false
+                indicator.isHidden = false
+                textField.isEnabled = false
+                indicator.startAnimating()
+                label.text = password
             }
         }
         DispatchQueue.main.async {
@@ -260,6 +262,7 @@ class ViewController: UIViewController {
             self.indicator.isHidden = true
             self.textField.isEnabled = true
             self.textField.isSecureTextEntry = false
+            self.buttonRandomPassword.isEnabled = true
         }
     }
 }
